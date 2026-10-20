@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>IdentiX · Identidades Trigonométricas</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.32.0/plotly.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.2/math.min.js"></script>
+<style>
+:root{
+  --azul:#0057FF; --azul-osc:#003BB3; --verde:#00B36B; --naranja:#FF7A00;
+  --blanco:#FFFFFF; --gris:#F2F4F8; --texto:#0B1220; --borde:#D8DEEA;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:var(--gris);color:var(--texto);line-height:1.45}
+header{background:linear-gradient(120deg,var(--azul),var(--azul-osc));color:var(--blanco);padding:1.4rem 1.2rem;position:sticky;top:0;z-index:5;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+header h1{margin:0;font-size:1.6rem;letter-spacing:.3px}
+header p{margin:.35rem 0 0;font-size:.95rem;opacity:.95;max-width:70ch}
+main{max-width:1100px;margin:0 auto;padding:1.2rem}
+section{background:var(--blanco);border:1px solid var(--borde);border-radius:10px;padding:1.1rem 1.2rem;margin-bottom:1.1rem}
+h2{margin-top:0;font-size:1.15rem;color:var(--azul-osc);border-left:5px solid var(--naranja);padding-left:.6rem}
+details summary{cursor:pointer;font-weight:600;color:var(--azul-osc)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+label{display:block;font-weight:600;margin-bottom:.3rem;font-size:.92rem}
+select,input[type=range],input[type=number],input[type=text]{width:100%;padding:.5rem;border:2px solid var(--borde);border-radius:6px;font-size:1rem;background:var(--blanco)}
+select:focus,input:focus,button:focus{outline:3px solid var(--naranja);outline-offset:2px}
+.ctrl-value{font-weight:700;color:var(--azul)}
+button{background:var(--azul);color:var(--blanco);border:none;padding:.6rem 1.1rem;border-radius:6px;font-weight:700;cursor:pointer;font-size:.95rem}
+button.verde{background:var(--verde)}
+button.naranja{background:var(--naranja)}
+button:hover{filter:brightness(1.1)}
+button:disabled{background:#9aa5b8;cursor:not-allowed}
+.calc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.7rem}
+.calc-item{background:var(--gris);border:1px solid var(--borde);border-radius:8px;padding:.6rem .7rem;text-align:center}
+.calc-item .fn{font-weight:700;color:var(--azul-osc)}
+.calc-item .val{font-size:1.25rem;font-weight:800;color:var(--verde)}
+#plot{width:100%;height:360px}
+.exercise-box{background:#EAF1FF;border:2px solid var(--azul);border-radius:8px;padding:1rem;margin-top:.8rem}
+.exercise-box p{font-size:1.05rem;margin:.3rem 0}
+.feedback{margin-top:.7rem;padding:.6rem .8rem;border-radius:6px;font-weight:700;display:none}
+.feedback.ok{background:#DFF6E8;color:#0A6B3E;border:2px solid var(--verde);display:block}
+.feedback.bad{background:#FFE7D6;color:#B84B00;border:2px solid var(--naranja);display:block}
+.pred-box{background:#FFF3E5;border:2px solid var(--naranja);border-radius:8px;padding:1rem;margin-top:1rem}
+.evidence{display:flex;flex-wrap:wrap;gap:1rem;align-items:center;justify-content:space-between}
+.badge{background:var(--azul-osc);color:var(--blanco);padding:.5rem .9rem;border-radius:20px;font-weight:700}
+table{width:100%;border-collapse:collapse;margin-top:.6rem;font-size:.9rem}
+th,td{border:1px solid var(--borde);padding:.4rem .5rem;text-align:left}
+th{background:var(--gris)}
+.alt-note{font-size:.85rem;color:#445;background:var(--gris);border-left:4px solid var(--verde);padding:.5rem .7rem;margin-top:.6rem;border-radius:4px}
+footer{text-align:center;padding:1rem;font-size:.85rem;color:#556}
+.tabnav{display:flex;flex-wrap:wrap;gap:.4rem;max-width:1100px;margin:0 auto;padding:0 1.2rem}
+.tabnav button{background:var(--azul-osc);opacity:.75;font-size:.9rem;padding:.55rem .9rem}
+.tabnav button.active{background:var(--naranja);opacity:1}
+.tabpage{display:none;opacity:0;transform:translateY(14px);transition:opacity .35s ease, transform .35s ease}
+.tabpage.active{opacity:1;transform:translateY(0)}
+@media(prefers-reduced-motion:reduce){.tabpage{transition:none}}
+.ejemplo{border:1px solid var(--borde);border-radius:8px;margin-bottom:.7rem;overflow:hidden}
+.ejemplo summary{background:var(--gris);padding:.6rem .8rem;font-weight:700}
+.ejemplo .pasos{padding:.7rem 1rem}
+.ejemplo .pasos li{margin-bottom:.4rem}
+.truco{background:#EAF1FF;border-left:5px solid var(--azul);border-radius:6px;padding:.6rem .9rem;margin-bottom:.6rem}
+.juego{border:2px solid var(--borde);border-radius:10px;padding:1rem;margin-bottom:1rem}
+.juego h3{margin-top:0;color:var(--azul-osc)}
+.op-btn{display:block;width:100%;text-align:left;margin-bottom:.5rem;background:var(--blanco);color:var(--texto);border:2px solid var(--azul);font-weight:600}
+.op-btn:hover{background:var(--azul);color:var(--blanco)}
+.op-btn.correcta{background:var(--verde);color:var(--blanco);border-color:var(--verde)}
+.op-btn.incorrecta{background:var(--naranja);color:var(--blanco);border-color:var(--naranja)}
+.memo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;max-width:520px}
+.memo-card{aspect-ratio:1;background:var(--azul);color:var(--blanco);border:none;border-radius:8px;font-weight:700;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;text-align:center;padding:.3rem}
+.memo-card.volteada{background:var(--blanco);color:var(--azul-osc);border:2px solid var(--azul)}
+.memo-card.match{background:var(--verde);color:var(--blanco)}
+@media(max-width:480px){.memo-grid{grid-template-columns:repeat(3,1fr)}}
+
+/* ---------- Portada ---------- */
+.cover{position:fixed;inset:0;z-index:60;background:linear-gradient(160deg,var(--azul-osc),var(--azul) 60%,var(--verde));display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--blanco);overflow:hidden;padding:1.5rem;opacity:1;transition:opacity .5s ease}
+.cover.oculto{opacity:0;pointer-events:none}
+@media(prefers-reduced-motion:reduce){.cover{transition:none}}
+.cover-logo{width:120px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.3))}
+.cover h1{font-size:2.3rem;margin:.8rem 0 .2rem;letter-spacing:.5px}
+.cover p{max-width:44ch;font-size:1.05rem;opacity:.95;margin:0 0 1.4rem}
+.cover button{background:var(--naranja);color:var(--blanco);padding:.85rem 1.6rem;font-size:1.05rem;border-radius:30px}
+.muneco{position:absolute;width:78px;animation:flotar 4.5s ease-in-out infinite}
+.muneco.m1{top:12%;left:8%;animation-delay:0s}
+.muneco.m2{top:18%;right:9%;animation-delay:.8s;width:66px}
+.muneco.m3{bottom:14%;left:12%;animation-delay:1.4s;width:60px}
+.muneco.m4{bottom:10%;right:11%;animation-delay:.4s}
+@keyframes flotar{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-20px) rotate(3deg)}}
+@media(prefers-reduced-motion:reduce){.muneco,.companion-avatar{animation:none!important}}
+
+/* ---------- Compañero flotante ---------- */
+.companion{position:fixed;right:14px;bottom:14px;z-index:30;display:flex;align-items:flex-end;gap:.5rem}
+.companion-bubble{background:var(--blanco);border:2px solid var(--azul);border-radius:14px;padding:.5rem .8rem;max-width:220px;font-size:.85rem;font-weight:600;box-shadow:0 4px 10px rgba(0,0,0,.15);opacity:1;transition:opacity .25s ease}
+.companion-bubble.cambiando{opacity:0}
+.companion-avatar{background:transparent;border:none;padding:0;width:64px;cursor:pointer;animation:flotar 3.5s ease-in-out infinite}
+@media(max-width:480px){.companion{right:8px;bottom:8px}.companion-bubble{max-width:150px;font-size:.78rem}.companion-avatar{width:52px}}
+
+/* ---------- Ola de transición ---------- */
+.wave-overlay{position:fixed;top:-15%;left:-40%;right:-40%;bottom:-15%;z-index:65;pointer-events:none;
+  background:linear-gradient(115deg,var(--azul) 0%,var(--verde) 55%,var(--azul-osc) 100%);
+  border-radius:40% 60% 55% 45% / 55% 45% 60% 40%;
+  transform:translateX(-160%) rotate(-4deg);
+  transition:transform .85s cubic-bezier(.65,0,.35,1);
+  box-shadow:0 0 70px rgba(0,87,255,.45)}
+.wave-overlay.activa{transform:translateX(0%) rotate(-4deg)}
+.wave-overlay.saliendo{transform:translateX(160%) rotate(-4deg)}
+@media(prefers-reduced-motion:reduce){.wave-overlay{display:none}}
+
+/* ---------- Álgebra con identidades ---------- */
+.demo-error{background:#FFF1E5;border:2px solid var(--naranja);border-radius:8px;padding:.7rem 1rem;margin:.6rem 0}
+.demo-correcto{background:#E7F8EE;border:2px solid var(--verde);border-radius:8px;padding:.7rem 1rem;margin:.6rem 0}
+.demo-error p, .demo-correcto p{margin:.25rem 0}
+.alg-cat{margin-bottom:2rem}
+.alg-ejercicio{border:1px solid var(--borde);border-radius:8px;padding:.8rem 1rem;margin-bottom:1rem;background:var(--gris)}
+.alg-ejercicio input{margin-top:.4rem}
+.alg-ejercicio .botones{margin-top:.6rem;display:flex;gap:.5rem;flex-wrap:wrap}
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 .15rem;font-size:.95em;line-height:1.05}
+.frac .num{border-bottom:1.8px solid currentColor;padding:0 .3rem 1px}
+.frac .den{padding:1px .3rem 0}
+@media (prefers-reduced-motion:no-preference){.pulse{animation:pulse 1.4s ease-in-out infinite}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@media(max-width:480px){header h1{font-size:1.3rem}.calc-item .val{font-size:1.05rem}}
+</style>
+</head>
+<body>
+
+<div class="wave-overlay" id="waveOverlay" aria-hidden="true"></div>
+
+<div class="cover" id="cover">
+  <svg class="muneco m1" viewBox="0 0 100 100"><circle cx="50" cy="55" r="36" fill="#00B36B"/><circle cx="38" cy="48" r="6" fill="#fff"/><circle cx="62" cy="48" r="6" fill="#fff"/><circle cx="38" cy="48" r="2.6" fill="#0B1220"/><circle cx="62" cy="48" r="2.6" fill="#0B1220"/><path d="M35 66 Q50 78 65 66" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M18 22 A28 28 0 0 1 46 10" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+  <svg class="muneco m2" viewBox="0 0 100 100"><circle cx="50" cy="55" r="34" fill="#FF7A00"/><circle cx="39" cy="49" r="5.5" fill="#fff"/><circle cx="61" cy="49" r="5.5" fill="#fff"/><circle cx="39" cy="49" r="2.4" fill="#0B1220"/><circle cx="61" cy="49" r="2.4" fill="#0B1220"/><path d="M36 65 Q50 74 64 65" stroke="#fff" stroke-width="3.5" fill="none" stroke-linecap="round"/><line x1="14" y1="16" x2="34" y2="8" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg>
+  <svg class="muneco m3" viewBox="0 0 100 100"><circle cx="50" cy="55" r="32" fill="#0057FF"/><circle cx="39" cy="49" r="5.2" fill="#fff"/><circle cx="61" cy="49" r="5.2" fill="#fff"/><circle cx="39" cy="49" r="2.3" fill="#0B1220"/><circle cx="61" cy="49" r="2.3" fill="#0B1220"/><path d="M37 64 Q50 73 63 64" stroke="#fff" stroke-width="3.4" fill="none" stroke-linecap="round"/><path d="M20 18 L38 18 L20 34 Z" fill="none" stroke="#fff" stroke-width="3"/></svg>
+  <svg class="muneco m4" viewBox="0 0 100 100"><circle cx="50" cy="55" r="36" fill="#00B36B"/><circle cx="38" cy="48" r="6" fill="#fff"/><circle cx="62" cy="48" r="6" fill="#fff"/><circle cx="38" cy="48" r="2.6" fill="#0B1220"/><circle cx="62" cy="48" r="2.6" fill="#0B1220"/><path d="M35 66 Q50 78 65 66" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/><line x1="80" y1="20" x2="80" y2="40" stroke="#fff" stroke-width="4" stroke-linecap="round"/><line x1="74" y1="20" x2="86" y2="20" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg>
+
+  <svg class="cover-logo" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="60" cy="60" r="52" fill="none" stroke="#FFFFFF" stroke-width="4"/>
+    <path d="M60 60 L60 20 A40 40 0 0 1 94 78 Z" fill="#FF7A00" opacity=".9"/>
+    <line x1="60" y1="60" x2="60" y2="20" stroke="#FFFFFF" stroke-width="3"/>
+    <line x1="60" y1="60" x2="94" y2="78" stroke="#FFFFFF" stroke-width="3"/>
+    <text x="60" y="106" text-anchor="middle" font-size="24" font-weight="800" fill="#FFFFFF" font-family="Segoe UI, Arial">θ</text>
+  </svg>
+  <h1>IdentiX</h1>
+  <p>Sen, Cos y Tan te acompañarán a descubrir las identidades trigonométricas de grado 10°. ¿Listo para empezar?</p>
+  <button id="btnComenzar">🚀 Comenzar</button>
+</div>
+
+<header>
+  <h1>📐 IdentiX</h1>
+  <p>Laboratorio interactivo de identidades trigonométricas — Grado 10°</p>
+</header>
+
+<nav class="tabnav" aria-label="Secciones de IdentiX">
+  <button class="tab-btn active" data-tab="practicar">🧪 Practicar</button>
+  <button class="tab-btn" data-tab="explicar">📘 Explicar el tema</button>
+  <button class="tab-btn" data-tab="ejemplos">📝 Ejemplos paso a paso</button>
+  <button class="tab-btn" data-tab="algebra">🧮 Álgebra con identidades</button>
+  <button class="tab-btn" data-tab="general">🧩 Casos generales</button>
+  <button class="tab-btn" data-tab="truquitos">💡 Truquitos</button>
+  <button class="tab-btn" data-tab="juegos">🎮 Juegos</button>
+</nav>
+
+<main>
+
+<div class="tabpage active" id="tab-practicar">
+<section>
+  <h2>🎯 Objetivo didáctico</h2>
+  <p>Al finalizar la actividad, el estudiante de grado 10° estará en capacidad de <strong>identificar, comprobar y simplificar</strong> identidades trigonométricas (pitagóricas, recíprocas y de cociente) para un ángulo dado, relacionando el valor numérico de cada razón trigonométrica con su representación gráfica en el círculo trigonométrico.</p>
+  <details>
+    <summary>📋 Instrucciones de uso</summary>
+    <ol>
+      <li>Mueve el control de <strong>ángulo</strong> o escribe un valor entre 0° y 360°.</li>
+      <li>Elige el <strong>tipo de identidad</strong>, la <strong>razón trigonométrica</strong> protagonista, el <strong>nivel de dificultad</strong> y el <strong>tipo de ejercicio</strong>.</li>
+      <li>Observa cómo cambian los cálculos en tiempo real y la gráfica comparativa.</li>
+      <li>Antes de ver el resultado exacto, intenta el <strong>reto de predicción</strong>.</li>
+      <li>Resuelve el ejercicio propuesto y recibe retroalimentación inmediata.</li>
+      <li>Al final, revisa tu <strong>evidencia de aprendizaje</strong> y expórtala si lo deseas.</li>
+    </ol>
+  </details>
+</section>
+
+<section>
+  <h2>🎛️ Controles</h2>
+  <div class="grid">
+    <div>
+      <label for="angulo">📐 Ángulo: <span class="ctrl-value" id="anguloVal">45°</span></label>
+      <input type="range" id="angulo" min="0" max="360" step="1" value="45">
+      <input type="number" id="anguloNum" min="0" max="360" step="1" value="45" aria-label="Ángulo en número">
+    </div>
+    <div>
+      <label for="identidad">🔢 Identidad</label>
+      <select id="identidad">
+        <option value="pitagorica">Pitagórica</option>
+        <option value="reciproca">Recíproca</option>
+        <option value="cociente">De cociente</option>
+      </select>
+    </div>
+    <div>
+      <label for="dificultad">🎚️ Dificultad</label>
+      <select id="dificultad">
+        <option value="basico">Básico</option>
+        <option value="intermedio">Intermedio</option>
+        <option value="avanzado">Avanzado</option>
+      </select>
+    </div>
+    <div>
+      <label for="razon">🧮 Razón trigonométrica</label>
+      <select id="razon">
+        <option value="sin">Seno</option>
+        <option value="cos">Coseno</option>
+        <option value="tan">Tangente</option>
+        <option value="sec">Secante</option>
+        <option value="csc">Cosecante</option>
+        <option value="cot">Cotangente</option>
+      </select>
+    </div>
+    <div>
+      <label for="tipoEj">✏️ Tipo de ejercicio</label>
+      <select id="tipoEj">
+        <option value="completar">Completar</option>
+        <option value="simplificar">Simplificar</option>
+        <option value="comprobar">Comprobar</option>
+      </select>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>🧮 Cálculos en tiempo real (θ = <span id="anguloEco">45°</span>)</h2>
+  <div class="calc-grid" id="calcGrid" aria-live="polite"></div>
+</section>
+
+<section>
+  <h2>📊 Gráfica comparativa</h2>
+  <div id="plot" role="img" aria-label="Gráfica de las funciones trigonométricas de 0 a 360 grados con el ángulo actual marcado"></div>
+  <p class="alt-note">🧭 Nota de accesibilidad: esta app usa una gráfica 2D interactiva (Plotly) en lugar de RA/RV con cámara o visor, porque el círculo trigonométrico en 2D representa con la misma claridad las identidades y funciona en cualquier dispositivo sin hardware especial. La tabla de valores exactos de abajo es una alternativa totalmente textual a la gráfica.</p>
+  <details><summary>Ver tabla de valores clave (0°, 30°, 45°, 60°, 90°...)</summary>
+    <table id="tablaValores"><thead><tr><th>θ</th><th>sen</th><th>cos</th><th>tan</th></tr></thead><tbody></tbody></table>
+  </details>
+</section>
+
+<section>
+  <h2>🔮 Reto de predicción</h2>
+  <div class="pred-box">
+    <p>Antes de ver el resultado exacto: <strong>¿cuál crees que es el valor de <span id="predFnLabel">sen(θ)</span> en θ = <span id="predAngulo">45°</span>?</strong> (aproxima a 2 decimales)</p>
+    <input type="text" id="predInput" placeholder="Ej: 0.71" aria-label="Tu predicción">
+    <div style="margin-top:.6rem"><button id="predCheck">Comprobar mi predicción</button></div>
+    <p id="predFeedback" class="feedback"></p>
+  </div>
+</section>
+
+<section>
+  <h2>✏️ Ejercicio</h2>
+  <div class="exercise-box" id="exerciseBox" aria-live="polite">
+    <p id="exText">Genera un nuevo ejercicio con los controles de arriba.</p>
+    <div id="exInputArea"></div>
+    <div style="margin-top:.7rem;display:flex;gap:.6rem;flex-wrap:wrap">
+      <button id="checkBtn" class="verde">Comprobar respuesta</button>
+      <button id="hintBtn" class="naranja">Ver pista</button>
+      <button id="newExBtn">🔄 Nuevo ejercicio</button>
+    </div>
+    <p id="hintText" style="display:none;font-style:italic;color:var(--azul-osc)"></p>
+    <p id="exFeedback" class="feedback"></p>
+  </div>
+</section>
+
+<section>
+  <h2>🏅 Evidencia final de aprendizaje</h2>
+  <div class="evidence">
+    <div class="badge">✅ Correctas: <span id="scoreOk">0</span></div>
+    <div class="badge">📝 Intentos: <span id="scoreTot">0</span></div>
+    <div class="badge">🎯 Precisión: <span id="scorePct">0%</span></div>
+    <button id="exportBtn">⬇️ Exportar evidencia</button>
+    <button id="resetBtn" style="background:#8892a6">Reiniciar progreso</button>
+  </div>
+  <p id="exportMsg" class="alt-note" style="display:none"></p>
+</section>
+</div><!-- /tab-practicar -->
+
+<div class="tabpage" id="tab-explicar">
+<section>
+  <h2>📘 ¿Qué es una identidad trigonométrica?</h2>
+  <p>Una <strong>identidad trigonométrica</strong> es una igualdad entre razones trigonométricas que es <strong>verdadera para todo valor de θ</strong> (excepto donde alguna razón no está definida). No es una ecuación que se resuelve para un ángulo específico: es una relación que siempre se cumple.</p>
+
+  <h2>1️⃣ Identidades pitagóricas</h2>
+  <p>Se basan en el teorema de Pitágoras aplicado al círculo trigonométrico (radio = 1):</p>
+  <ul>
+    <li><strong>sen²θ + cos²θ = 1</strong></li>
+    <li><strong>1 + tan²θ = sec²θ</strong></li>
+    <li><strong>1 + cot²θ = csc²θ</strong></li>
+  </ul>
+
+  <h2>2️⃣ Identidades recíprocas</h2>
+  <p>Cada razón tiene una "pareja" que es su inverso multiplicativo:</p>
+  <ul>
+    <li><strong>csc θ = <span class="frac"><span class="num">1</span><span class="den">sen θ</span></span></strong></li>
+    <li><strong>sec θ = <span class="frac"><span class="num">1</span><span class="den">cos θ</span></span></strong></li>
+    <li><strong>cot θ = <span class="frac"><span class="num">1</span><span class="den">tan θ</span></span></strong></li>
+  </ul>
+
+  <h2>3️⃣ Identidades de cociente</h2>
+  <p>Relacionan tangente y cotangente con seno y coseno:</p>
+  <ul>
+    <li><strong>tan θ = <span class="frac"><span class="num">sen θ</span><span class="den">cos θ</span></span></strong></li>
+    <li><strong>cot θ = <span class="frac"><span class="num">cos θ</span><span class="den">sen θ</span></span></strong></li>
+  </ul>
+
+  <h2>🧭 ¿Por qué importan?</h2>
+  <p>Permiten <strong>simplificar expresiones</strong>, <strong>comprobar igualdades</strong> y <strong>resolver ecuaciones trigonométricas</strong> sin depender de una calculadora, reconociendo patrones entre las seis razones.</p>
+  <p class="alt-note">👉 Ve a la pestaña <strong>Ejemplos paso a paso</strong> para ver estas identidades aplicadas, o a <strong>Practicar</strong> para calcularlas con cualquier ángulo.</p>
+</section>
+</div>
+
+<div class="tabpage" id="tab-ejemplos">
+<section>
+  <h2>📝 Ejemplos resueltos paso a paso</h2>
+  <details class="ejemplo" open><summary>Ejemplo 1 · Pitagórica — Comprobar para θ = 30°</summary>
+    <ol class="pasos">
+      <li>Datos: sen(30°) = 0.5, cos(30°) = 0.87</li>
+      <li>Elevamos al cuadrado: sen²(30°) = 0.25, cos²(30°) = 0.7569</li>
+      <li>Sumamos: 0.25 + 0.7569 = 1.0069 ≈ 1 (la diferencia es por redondeo)</li>
+      <li>Conclusión: se comprueba sen²θ + cos²θ = 1 ✅</li>
+    </ol>
+  </details>
+  <details class="ejemplo"><summary>Ejemplo 2 · Pitagórica — Simplificar sec²θ − tan²θ</summary>
+    <ol class="pasos">
+      <li>Partimos de 1 + tan²θ = sec²θ</li>
+      <li>Despejamos: sec²θ − tan²θ = 1</li>
+      <li>Conclusión: la expresión se simplifica siempre a <strong>1</strong>, sin importar θ</li>
+    </ol>
+  </details>
+  <details class="ejemplo"><summary>Ejemplo 3 · Recíproca — Hallar csc(θ) si sen(θ) = 0.6</summary>
+    <ol class="pasos">
+      <li>Identidad recíproca: csc θ = <span class="frac"><span class="num">1</span><span class="den">sen θ</span></span></li>
+      <li>Sustituimos: csc θ = <span class="frac"><span class="num">1</span><span class="den">0.6</span></span></li>
+      <li>Calculamos: csc θ = 1.67</li>
+      <li>Conclusión: csc(θ) ≈ 1.67</li>
+    </ol>
+  </details>
+  <details class="ejemplo"><summary>Ejemplo 4 · Recíproca — Completar sec(θ) · cos(θ) = ___</summary>
+    <ol class="pasos">
+      <li>Recordamos: sec θ = <span class="frac"><span class="num">1</span><span class="den">cos θ</span></span></li>
+      <li>Sustituimos: (<span class="frac"><span class="num">1</span><span class="den">cos θ</span></span>) · cos θ</li>
+      <li>Los cos θ se cancelan (si cos θ ≠ 0)</li>
+      <li>Conclusión: el resultado siempre es <strong>1</strong></li>
+    </ol>
+  </details>
+  <details class="ejemplo"><summary>Ejemplo 5 · Cociente — Comprobar tan(45°) usando sen y cos</summary>
+    <ol class="pasos">
+      <li>Datos: sen(45°) = 0.71, cos(45°) = 0.71</li>
+      <li>Identidad: tan θ = <span class="frac"><span class="num">sen θ</span><span class="den">cos θ</span></span></li>
+      <li>Sustituimos: tan(45°) = <span class="frac"><span class="num">0.71</span><span class="den">0.71</span></span> = 1</li>
+      <li>Conclusión: tan(45°) = 1 ✅</li>
+    </ol>
+  </details>
+  <details class="ejemplo"><summary>Ejemplo 6 · Cociente — Simplificar (sen θ / cos θ) · (cos θ / sen θ)</summary>
+    <ol class="pasos">
+      <li>La primera fracción es tan θ, la segunda es cot θ</li>
+      <li>tan θ · cot θ = tan θ · (<span class="frac"><span class="num">1</span><span class="den">tan θ</span></span>)</li>
+      <li>Se cancela tan θ</li>
+      <li>Conclusión: el resultado siempre es <strong>1</strong> (cuando ambas existen)</li>
+    </ol>
+  </details>
+  <p class="alt-note">🔁 Cambia el ángulo en la pestaña <strong>Practicar</strong> y repite estos mismos pasos con tus propios números.</p>
+</section>
+</div>
+
+<div class="tabpage" id="tab-algebra">
+<section>
+  <h2>🧮 Álgebra con identidades trigonométricas</h2>
+  <p>Aquí usarás las identidades para <strong>despejar ecuaciones</strong>, <strong>factorizar</strong> y <strong>simplificar</strong> expresiones, tal como en álgebra normal, pero con razones trigonométricas. Cada caso trae primero un ejemplo resuelto señalando un error común, y luego ejercicios más largos que combinan varios pasos.</p>
+
+  <div class="alg-cat">
+    <h2>1️⃣ Despeje de ecuaciones trigonométricas</h2>
+    <p><strong>Ejemplo:</strong> Resolver 2sen(θ) − 1 = 0</p>
+    <div class="demo-error"><p>❌ <strong>Error común:</strong> pasar el −1 "sumando mal" y escribir sen(θ) = 1 − 2 = −1. Esto ocurre por despejar sin respetar el signo original de cada término.</p></div>
+    <div class="demo-correcto">
+      <p>✅ <strong>Procedimiento correcto:</strong></p>
+      <ol class="pasos">
+        <li>2 sen(θ) − 1 = 0</li>
+        <li>Sumamos 1 en ambos lados: 2 sen(θ) = 1</li>
+        <li>Dividimos entre 2: sen(θ) = <span class="frac"><span class="num">1</span><span class="den">2</span></span> = 0.5</li>
+        <li>Buscamos los ángulos entre 0° y 360° donde sen(θ) = 0.5 → θ = 30° y θ = 150°</li>
+      </ol>
+    </div>
+    <div class="alg-ejercicio">
+      <p><strong>Ejercicio A:</strong> Resuelve para sen(θ) en la ecuación 3·sen(θ) + 2 = 5 − sen(θ). Luego, usando la identidad pitagórica, calcula el valor de cos²(θ) correspondiente. Escribe el resultado final (cos²θ) con 2 decimales.</p>
+      <input type="text" id="alg1" placeholder="Ej: 0.44">
+      <div class="botones">
+        <button class="verde" data-check="alg1" data-tipo="numero" data-resp="0.44">Comprobar</button>
+        <button class="naranja" data-toggle="sol1">Ver solución</button>
+      </div>
+      <p id="fb-alg1" class="feedback"></p>
+      <div id="sol1" style="display:none" class="demo-correcto">
+        <ol class="pasos">
+          <li>3sen(θ) + 2 = 5 − sen(θ)</li>
+          <li>Agrupamos los términos con sen(θ): 3sen(θ) + sen(θ) = 5 − 2</li>
+          <li>4sen(θ) = 3 → sen(θ) = <span class="frac"><span class="num">3</span><span class="den">4</span></span> = 0.75</li>
+          <li>Identidad pitagórica: cos²(θ) = 1 − sen²(θ) = 1 − 0.5625</li>
+          <li>Resultado: cos²(θ) = 0.4375 ≈ 0.44</li>
+        </ol>
+      </div>
+    </div>
+    <div class="alg-ejercicio">
+      <p><strong>Ejercicio B:</strong> Resuelve para cos(θ) en la ecuación 2·(cos(θ) + 1) = 3 − cos(θ). Luego, usando la identidad recíproca, calcula sec(θ). Escribe sec(θ) con 2 decimales.</p>
+      <input type="text" id="alg2" placeholder="Ej: 3.00">
+      <div class="botones">
+        <button class="verde" data-check="alg2" data-tipo="numero" data-resp="3">Comprobar</button>
+        <button class="naranja" data-toggle="sol2">Ver solución</button>
+      </div>
+      <p id="fb-alg2" class="feedback"></p>
+      <div id="sol2" style="display:none" class="demo-correcto">
+        <ol class="pasos">
+          <li>2(cos(θ) + 1) = 3 − cos(θ)</li>
+          <li>Distribuimos: 2cos(θ) + 2 = 3 − cos(θ)</li>
+          <li>Agrupamos: 2cos(θ) + cos(θ) = 3 − 2 → 3cos(θ) = 1</li>
+          <li>cos(θ) = <span class="frac"><span class="num">1</span><span class="den">3</span></span> ≈ 0.33</li>
+          <li>Identidad recíproca: sec(θ) = <span class="frac"><span class="num">1</span><span class="den">cos(θ)</span></span> = <span class="frac"><span class="num">1</span><span class="den">0.33</span></span> ≈ 3.00</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <div class="alg-cat">
+    <h2>2️⃣ Factorización de expresiones trigonométricas</h2>
+    <p><strong>Ejemplo:</strong> Factorizar sen²(θ) − cos²(θ)</p>
+    <div class="demo-error"><p>❌ <strong>Error común:</strong> tratarla como trinomio cuadrado perfecto y escribir (sen(θ) − cos(θ))². Esa fórmula es para a² − 2ab + b², no para una simple diferencia de cuadrados.</p></div>
+    <div class="demo-correcto">
+      <p>✅ <strong>Procedimiento correcto:</strong></p>
+      <ol class="pasos">
+        <li>Reconocemos la forma a² − b², con a = sen(θ), b = cos(θ)</li>
+        <li>Aplicamos la diferencia de cuadrados: a² − b² = (a − b)(a + b)</li>
+        <li>Resultado: (sen(θ) − cos(θ))(sen(θ) + cos(θ))</li>
+      </ol>
+    </div>
+    <div class="alg-ejercicio">
+      <p><strong>Ejercicio C:</strong> Factoriza completamente: sen²(θ)·cos(θ) − cos³(θ). (Pista: primero saca el factor común y luego busca una diferencia de cuadrados dentro del paréntesis).</p>
+      <input type="text" id="alg3" placeholder="Ej: cos(θ)(sen(θ)-cos(θ))(sen(θ)+cos(θ))">
+      <div class="botones">
+        <button class="verde" data-check="alg3" data-tipo="texto" data-resp="cos(θ)(sen(θ)-cos(θ))(sen(θ)+cos(θ))" data-alt="cos(θ)(sen(θ)+cos(θ))(sen(θ)-cos(θ))|cosθ(senθ-cosθ)(senθ+cosθ)">Comprobar</button>
+        <button class="naranja" data-toggle="sol3">Ver solución</button>
+      </div>
+      <p id="fb-alg3" class="feedback"></p>
+      <div id="sol3" style="display:none" class="demo-correcto">
+        <ol class="pasos">
+          <li>Sacamos el factor común cos(θ): cos(θ)·(sen²(θ) − cos²(θ))</li>
+          <li>Dentro del paréntesis hay una diferencia de cuadrados: sen²(θ) − cos²(θ) = (sen(θ) − cos(θ))(sen(θ) + cos(θ))</li>
+          <li>Resultado final: cos(θ)·(sen(θ) − cos(θ))·(sen(θ) + cos(θ))</li>
+        </ol>
+      </div>
+    </div>
+    <div class="alg-ejercicio">
+      <p><strong>Ejercicio D:</strong> Factoriza: sec²(θ) − 2·sec(θ)·tan(θ) + tan²(θ). (Pista: identifica el patrón a² − 2ab + b²).</p>
+      <input type="text" id="alg4" placeholder="Ej: (sec(θ)-tan(θ))²">
+      <div class="botones">
+        <button class="verde" data-check="alg4" data-tipo="texto" data-resp="(sec(θ)-tan(θ))²" data-alt="(sec(θ)-tan(θ))^2|(secθ-tanθ)²">Comprobar</button>
+        <button class="naranja" data-toggle="sol4">Ver solución</button>
+      </div>
+      <p id="fb-alg4" class="feedback"></p>
+      <div id="sol4" style="display:none" class="demo-correcto">
+        <ol class="pasos">
+          <li>Es un trinomio cuadrado perfecto: a² − 2ab + b²</li>
+          <li>Con a = sec(θ), b = tan(θ)</li>
+          <li>Se factoriza como (a − b)²: (sec(θ) − tan(θ))²</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <div class="alg-cat">
+    <h2>3️⃣ Simplificación algebraica (combinando fracciones)</h2>
+    <p><strong>Ejemplo:</strong> Simplificar <span class="frac"><span class="num">1</span><span class="den">sen(θ)</span></span> + <span class="frac"><span class="num">cos(θ)</span><span class="den">sen(θ)</span></span></p>
+    <div class="demo-error"><p>❌ <strong>Error común:</strong> sumar numeradores y denominadores por separado, escribiendo el resultado como una fracción con denominador "2sen(θ)". Al tener ya el mismo denominador, no se debe duplicar.</p></div>
+    <div class="demo-correcto">
+      <p>✅ <strong>Procedimiento correcto:</strong></p>
+      <ol class="pasos">
+        <li>Ambas fracciones ya tienen el mismo denominador: sen(θ)</li>
+        <li>Sumamos solo los numeradores: 1 + cos(θ)</li>
+        <li>Resultado: <span class="frac"><span class="num">1 + cos(θ)</span><span class="den">sen(θ)</span></span></li>
+      </ol>
+    </div>
+    <div class="alg-ejercicio">
+      <p><strong>Ejercicio E:</strong> Simplifica combinando en una sola fracción y usando la identidad pitagórica: <span class="frac"><span class="num">sen(θ)</span><span class="den">1 + cos(θ)</span></span> + <span class="frac"><span class="num">1 + cos(θ)</span><span class="den">sen(θ)</span></span></p>
+      <input type="text" id="alg5" placeholder="Ej: 2/sen(θ)">
+      <div class="botones">
+        <button class="verde" data-check="alg5" data-tipo="texto" data-resp="2/sen(θ)" data-alt="2/senθ|2csc(θ)|2cscθ">Comprobar</button>
+        <button class="naranja" data-toggle="sol5">Ver solución</button>
+      </div>
+      <p id="fb-alg5" class="feedback"></p>
+      <div id="sol5" style="display:none" class="demo-correcto">
+        <ol class="pasos">
+          <li>Común denominador: sen(θ)·(1+cos(θ))</li>
+          <li>Numerador: sen²(θ) + (1+cos(θ))² = sen²(θ) + 1 + 2cos(θ) + cos²(θ)</li>
+          <li>Agrupamos sen²(θ)+cos²(θ) = 1 (identidad pitagórica): queda 1 + 1 + 2cos(θ) = 2 + 2cos(θ)</li>
+          <li>Factorizamos 2 en el numerador: 2(1+cos(θ))</li>
+          <li>Simplificamos (1+cos(θ)) con el denominador: queda <span class="frac"><span class="num">2</span><span class="den">sen(θ)</span></span></li>
+        </ol>
+      </div>
+    </div>
+    <div class="alg-ejercicio">
+      <p><strong>Ejercicio F:</strong> Simplifica combinando en una sola fracción: <span class="frac"><span class="num">1 − sen(θ)</span><span class="den">cos(θ)</span></span> + <span class="frac"><span class="num">cos(θ)</span><span class="den">1 − sen(θ)</span></span></p>
+      <input type="text" id="alg6" placeholder="Ej: 2/cos(θ)">
+      <div class="botones">
+        <button class="verde" data-check="alg6" data-tipo="texto" data-resp="2/cos(θ)" data-alt="2/cosθ|2sec(θ)|2secθ">Comprobar</button>
+        <button class="naranja" data-toggle="sol6">Ver solución</button>
+      </div>
+      <p id="fb-alg6" class="feedback"></p>
+      <div id="sol6" style="display:none" class="demo-correcto">
+        <ol class="pasos">
+          <li>Común denominador: cos(θ)·(1−sen(θ))</li>
+          <li>Numerador: (1−sen(θ))² + cos²(θ) = 1 − 2sen(θ) + sen²(θ) + cos²(θ)</li>
+          <li>Agrupamos sen²(θ)+cos²(θ)=1: queda 1 − 2sen(θ) + 1 = 2 − 2sen(θ)</li>
+          <li>Factorizamos: 2(1−sen(θ))</li>
+          <li>Simplificamos con el denominador: queda <span class="frac"><span class="num">2</span><span class="den">cos(θ)</span></span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+
+<div class="tabpage" id="tab-general">
+<section>
+  <h2>🧩 Casos generales (sin datos específicos)</h2>
+  <p>Aquí no se te da ningún ángulo ni valor numérico. Debes trabajar de forma <strong>simbólica</strong>, usando solo álgebra e identidades, para que el resultado sea válido para <strong>cualquier θ</strong>.</p>
+
+  <div class="alg-cat">
+    <p><strong>Ejemplo:</strong> Demuestra que sec²(θ) · cos²(θ) = 1, para cualquier θ (donde cos(θ) ≠ 0).</p>
+    <div class="demo-error"><p>❌ <strong>Error común:</strong> reemplazar θ por un ángulo cualquiera, por ejemplo 0°, comprobar que da 1, y concluir "ya quedó demostrado". Eso solo comprueba <em>un caso particular</em>, no prueba que se cumpla siempre.</p></div>
+    <div class="demo-correcto">
+      <p>✅ <strong>Procedimiento correcto (símbolico, sin números):</strong></p>
+      <ol class="pasos">
+        <li>Partimos de la identidad recíproca: sec(θ) = <span class="frac"><span class="num">1</span><span class="den">cos(θ)</span></span></li>
+        <li>Elevamos al cuadrado: sec²(θ) = <span class="frac"><span class="num">1</span><span class="den">cos²(θ)</span></span></li>
+        <li>Sustituimos en la expresión: <span class="frac"><span class="num">1</span><span class="den">cos²(θ)</span></span> · cos²(θ)</li>
+        <li>Los cos²(θ) se cancelan (válido para todo θ con cos(θ) ≠ 0)</li>
+        <li>Resultado: 1, para cualquier θ ✅</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="alg-ejercicio">
+    <p><strong>Ejercicio G1:</strong> Demuestra, sin usar ningún ángulo concreto, que (sen(θ) + cos(θ))² + (sen(θ) − cos(θ))² es una constante para cualquier θ. Escribe esa constante.</p>
+    <input type="text" id="alg7" placeholder="Ej: 2">
+    <div class="botones">
+      <button class="verde" data-check="alg7" data-tipo="numero" data-resp="2">Comprobar</button>
+      <button class="naranja" data-toggle="sol7">Ver solución</button>
+    </div>
+    <p id="fb-alg7" class="feedback"></p>
+    <div id="sol7" style="display:none" class="demo-correcto">
+      <ol class="pasos">
+        <li>Expandimos el primer cuadrado: sen²(θ) + 2sen(θ)cos(θ) + cos²(θ)</li>
+        <li>Expandimos el segundo: sen²(θ) − 2sen(θ)cos(θ) + cos²(θ)</li>
+        <li>Sumamos ambos: 2sen²(θ) + 2cos²(θ) (los términos con 2sen(θ)cos(θ) se cancelan)</li>
+        <li>Factorizamos: 2·(sen²(θ) + cos²(θ))</li>
+        <li>Por identidad pitagórica, sen²(θ)+cos²(θ)=1 → resultado: 2·1 = 2, para cualquier θ</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="alg-ejercicio">
+    <p><strong>Ejercicio G2:</strong> Simplifica la expresión sen(θ) · cot(θ) hasta dejarla en términos de una sola razón trigonométrica (sin dar ningún valor a θ).</p>
+    <input type="text" id="alg8" placeholder="Ej: cos(θ)">
+    <div class="botones">
+      <button class="verde" data-check="alg8" data-tipo="texto" data-resp="cos(θ)" data-alt="cosθ">Comprobar</button>
+      <button class="naranja" data-toggle="sol8">Ver solución</button>
+    </div>
+    <p id="fb-alg8" class="feedback"></p>
+    <div id="sol8" style="display:none" class="demo-correcto">
+      <ol class="pasos">
+        <li>Identidad de cociente: cot(θ) = <span class="frac"><span class="num">cos(θ)</span><span class="den">sen(θ)</span></span></li>
+        <li>Sustituimos: sen(θ) · <span class="frac"><span class="num">cos(θ)</span><span class="den">sen(θ)</span></span></li>
+        <li>El sen(θ) se cancela (para todo θ con sen(θ) ≠ 0)</li>
+        <li>Resultado: cos(θ), válido para cualquier θ</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="alg-ejercicio">
+    <p><strong>Ejercicio G3:</strong> Demuestra que tan(θ) + cot(θ) es igual a una sola fracción con denominador sen(θ)·cos(θ), para cualquier θ. Escribe el resultado simplificado.</p>
+    <input type="text" id="alg9" placeholder="Ej: 1/(sen(θ)·cos(θ))">
+    <div class="botones">
+      <button class="verde" data-check="alg9" data-tipo="texto" data-resp="1/(sen(θ)·cos(θ))" data-alt="1/(sen(θ)cos(θ))|1/(senθcosθ)|1/(senθ·cosθ)">Comprobar</button>
+      <button class="naranja" data-toggle="sol9">Ver solución</button>
+    </div>
+    <p id="fb-alg9" class="feedback"></p>
+    <div id="sol9" style="display:none" class="demo-correcto">
+      <ol class="pasos">
+        <li>Escribimos cada término como cociente: <span class="frac"><span class="num">sen(θ)</span><span class="den">cos(θ)</span></span> + <span class="frac"><span class="num">cos(θ)</span><span class="den">sen(θ)</span></span></li>
+        <li>Común denominador: sen(θ)·cos(θ)</li>
+        <li>Numerador: sen²(θ) + cos²(θ) = 1 (identidad pitagórica), sin importar el valor de θ</li>
+        <li>Resultado: <span class="frac"><span class="num">1</span><span class="den">sen(θ)·cos(θ)</span></span></li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="alg-ejercicio">
+    <p><strong>Ejercicio G4:</strong> Simplifica, sin usar ningún ángulo específico: (1 − sen²(θ))·(1 + tan²(θ)). Escribe el valor constante al que se reduce.</p>
+    <input type="text" id="alg10" placeholder="Ej: 1">
+    <div class="botones">
+      <button class="verde" data-check="alg10" data-tipo="numero" data-resp="1">Comprobar</button>
+      <button class="naranja" data-toggle="sol10">Ver solución</button>
+    </div>
+    <p id="fb-alg10" class="feedback"></p>
+    <div id="sol10" style="display:none" class="demo-correcto">
+      <ol class="pasos">
+        <li>Identidad pitagórica: 1 − sen²(θ) = cos²(θ)</li>
+        <li>Identidad pitagórica: 1 + tan²(θ) = sec²(θ)</li>
+        <li>Sustituimos: cos²(θ) · sec²(θ)</li>
+        <li>Como sec(θ) = <span class="frac"><span class="num">1</span><span class="den">cos(θ)</span></span>, entonces sec²(θ) = <span class="frac"><span class="num">1</span><span class="den">cos²(θ)</span></span></li>
+        <li>cos²(θ) · <span class="frac"><span class="num">1</span><span class="den">cos²(θ)</span></span> = 1, para cualquier θ donde cos(θ) ≠ 0</li>
+      </ol>
+    </div>
+  </div>
+</section>
+</div>
+
+<div class="tabpage" id="tab-truquitos">
+<section>
+  <h2>💡 Truquitos para no olvidar las identidades</h2>
+  <div class="truco">🐘 <strong>"SOH-CAH-TOA" extendido:</strong> si recuerdas que tan = sen/cos, puedes deducir cot = cos/sen invirtiendo la fracción.</div>
+  <div class="truco">🔄 <strong>Los recíprocos van en pares de letras:</strong> sen↔csc, cos↔sec, tan↔cot. Nota que sec "suena" a cos y csc "suena" a sen, ¡al revés de lo intuitivo! Apréndelos como pares, no por separado.</div>
+  <div class="truco">📐 <strong>La identidad "madre" es sen²θ+cos²θ=1.</strong> Las otras dos pitagóricas salen de dividirla: entre cos²θ obtienes 1+tan²θ=sec²θ; entre sen²θ obtienes 1+cot²θ=csc²θ.</div>
+  <div class="truco">🚫 <strong>Cuidado con las divisiones entre cero:</strong> tan y sec no existen en 90° y 270°; cot y csc no existen en 0° y 180°. Si tu resultado da "indefinido", ¡revisa el ángulo, no tu procedimiento!</div>
+  <div class="truco">✅ <strong>Para comprobar una identidad:</strong> trabaja un solo lado de la igualdad hasta llegar al otro lado; evita pasar términos "cruzando el igual" como en una ecuación.</div>
+  <div class="truco">🎯 <strong>Errores comunes:</strong> confundir sen²θ con sen(θ²); olvidar que 1 solo se puede reemplazar por sen²θ+cos²θ cuando conviene a la simplificación.</div>
+</section>
+</div>
+
+<div class="tabpage" id="tab-juegos">
+<section>
+  <h2>🎮 Zona de juegos</h2>
+  <p>Pon a prueba lo aprendido con retos generados al azar. Cada juego lleva su propio marcador.</p>
+
+  <div class="juego">
+    <h3>🎯 Juego 1 · Quiz relámpago</h3>
+    <p id="quizPregunta">Presiona "Nueva pregunta" para comenzar.</p>
+    <div id="quizOpciones"></div>
+    <button id="quizNueva">🔄 Nueva pregunta</button>
+    <p>Puntaje: <span id="quizScore">0</span> / <span id="quizTot">0</span></p>
+  </div>
+
+  <div class="juego">
+    <h3>❓ Juego 2 · Verdadero o Falso</h3>
+    <p id="vfEnunciado">Presiona "Nuevo enunciado" para comenzar.</p>
+    <div style="display:flex;gap:.6rem">
+      <button id="vfTrue" class="verde">Verdadero</button>
+      <button id="vfFalse" class="naranja">Falso</button>
+    </div>
+    <p id="vfFeedback" class="feedback"></p>
+    <button id="vfNueva" style="margin-top:.4rem">🔄 Nuevo enunciado</button>
+    <p>Puntaje: <span id="vfScore">0</span> / <span id="vfTot">0</span></p>
+  </div>
+
+  <div class="juego">
+    <h3>🧠 Juego 3 · Memorama de identidades</h3>
+    <p>Encuentra las 4 parejas expresión ↔ resultado equivalente.</p>
+    <div class="memo-grid" id="memoGrid"></div>
+    <button id="memoReiniciar" style="margin-top:.6rem">🔄 Reiniciar memorama</button>
+    <p>Intentos: <span id="memoIntentos">0</span> · Parejas encontradas: <span id="memoParejas">0</span>/4</p>
+  </div>
+</section>
+</div>
+
+</main>
+<footer>IdentiX · Recurso educativo original para grado 10° · Estructura de interacción inspirada en simuladores tipo MathXR Fusion EDU</footer>
+
+<div class="companion" id="companion">
+  <div class="companion-bubble" id="companionBubble">¡Hola! Soy Sen 👋 Toca "Comenzar" para iniciar tu recorrido por IdentiX.</div>
+  <button class="companion-avatar" id="companionAvatar" aria-label="Mostrar un consejo de tu guía Sen">
+    <svg viewBox="0 0 100 100"><circle cx="50" cy="55" r="36" fill="#0057FF"/><circle cx="38" cy="48" r="6" fill="#fff"/><circle cx="62" cy="48" r="6" fill="#fff"/><circle cx="38" cy="48" r="2.6" fill="#0B1220"/><circle cx="62" cy="48" r="2.6" fill="#0B1220"/><path d="M35 66 Q50 78 65 66" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+  </button>
+</div>
+
+<script>
+/* ===================== ADAPTACIÓN RÁPIDA =====================
+ - Para añadir más ejercicios: edita el objeto BANCO más abajo.
+ - Para cambiar la paleta: modifica las variables --azul/--verde/--naranja en :root.
+ - Para otro grado/nivel: ajusta los textos de 'dificultad' y BANCO.
+ =============================================================== */
+
+const $ = id => document.getElementById(id);
+const toRad = d => d * Math.PI / 180;
+const round2 = n => Math.round(n * 100) / 100;
+
+function razones(deg){
+  const r = toRad(deg);
+  const s = Math.sin(r), c = Math.cos(r);
+  const t = Math.abs(c) < 1e-9 ? NaN : s / c;
+  return {
+    sin: s, cos: c, tan: t,
+    csc: Math.abs(s) < 1e-9 ? NaN : 1 / s,
+    sec: Math.abs(c) < 1e-9 ? NaN : 1 / c,
+    cot: Math.abs(t) < 1e-9 || isNaN(t) ? NaN : 1 / t
+  };
+}
+const fmt = v => (v === undefined || isNaN(v)) ? "indefinido" : round2(v).toFixed(2);
+const NOMBRES = {sin:"seno",cos:"coseno",tan:"tangente",sec:"secante",csc:"cosecante",cot:"cotangente"};
+
+let progreso = {ok:0, tot:0, log:[]};
+
+// ---------- Cálculos en tiempo real ----------
+function actualizarCalculos(){
+  const deg = Number($("angulo").value);
+  const v = razones(deg);
+  $("calcGrid").innerHTML = Object.entries(v).map(([k,val])=>
+    `<div class="calc-item"><div class="fn">${NOMBRES[k]}(θ)</div><div class="val">${fmt(val)}</div></div>`
+  ).join("");
+  $("anguloEco").textContent = deg + "°";
+  return v;
+}
+
+// ---------- Gráfica comparativa ----------
+function dibujarGrafica(){
+  const razon = $("razon").value;
+  const deg = Number($("angulo").value);
+  const xs = [], ys1 = [], ys2 = [];
+  const funcMap = {sin:Math.sin,cos:Math.cos,tan:Math.tan};
+  for(let a=0;a<=360;a+=2){
+    xs.push(a);
+    const r = toRad(a);
+    const v = razones(a);
+    ys1.push(v[razon]);
+    ys2.push(v.sin*v.sin + v.cos*v.cos); // referencia: identidad pitagórica base =1
+  }
+  const v0 = razones(deg);
+  const trazoPrincipal = {x:xs, y:ys1.map(y=>Math.max(-4,Math.min(4,y))), type:'scatter', mode:'lines', name:NOMBRES[razon], line:{color:'#0057FF', width:3}};
+  const trazoRef = {x:xs, y:ys2, type:'scatter', mode:'lines', name:'sen²θ + cos²θ', line:{color:'#00B36B', width:2, dash:'dot'}};
+  const marcador = {x:[deg], y:[Math.max(-4,Math.min(4,v0[razon]))], type:'scatter', mode:'markers', name:'θ actual', marker:{color:'#FF7A00', size:14, symbol:'diamond'}};
+  Plotly.newPlot('plot', [trazoPrincipal, trazoRef, marcador], {
+    margin:{t:20,r:20,l:45,b:40},
+    xaxis:{title:'Ángulo (°)', range:[0,360]},
+    yaxis:{title:'Valor', range:[-4,4]},
+    legend:{orientation:'h', y:-0.25},
+    font:{family:'Segoe UI, Arial, sans-serif'}
+  }, {responsive:true, displayModeBar:false});
+
+  const tb = $("tablaValores").querySelector("tbody");
+  tb.innerHTML = [0,30,45,60,90,180,270].map(a=>{
+    const v = razones(a);
+    return `<tr><td>${a}°</td><td>${fmt(v.sin)}</td><td>${fmt(v.cos)}</td><td>${fmt(v.tan)}</td></tr>`;
+  }).join("");
+}
+
+// ---------- Reto de predicción ----------
+function actualizarPrediccion(){
+  const razon = $("razon").value, deg = Number($("angulo").value);
+  $("predFnLabel").textContent = `${NOMBRES[razon]}(θ)`;
+  $("predAngulo").textContent = deg + "°";
+  $("predInput").value = "";
+  $("predFeedback").className = "feedback";
+  $("predFeedback").textContent = "";
+}
+$("predCheck").addEventListener("click", ()=>{
+  const razon = $("razon").value, deg = Number($("angulo").value);
+  const real = razones(deg)[razon];
+  const guess = parseFloat($("predInput").value.replace(",", "."));
+  const fb = $("predFeedback");
+  if(isNaN(guess)){ fb.className="feedback bad"; fb.textContent="✋ Escribe un número válido antes de comprobar."; return; }
+  const diff = isNaN(real) ? Infinity : Math.abs(guess - real);
+  if(!isNaN(real) && diff <= 0.05){
+    fb.className = "feedback ok";
+    fb.textContent = `🎉 ¡Muy cerca! El valor real es ${fmt(real)}. Diferencia: ${round2(diff)}.`;
+  } else if(isNaN(real)){
+    fb.className = "feedback ok";
+    fb.textContent = `🤔 En este ángulo la razón es indefinida (división entre 0). ¡Buen momento para repasar por qué!`;
+  } else {
+    fb.className = "feedback bad";
+    fb.textContent = `📌 El valor real es ${fmt(real)}. Tu predicción fue ${guess}. Analiza el cuadrante y vuelve a intentarlo.`;
+  }
+});
+
+// ---------- Banco de ejercicios ----------
+const BANCO = {
+  pitagorica: {
+    basico: (v,razon,deg)=>({
+      texto:`Completa la identidad pitagórica: sen²(θ) + ____ = 1, para θ = ${deg}°.`,
+      tipo:"texto", respuesta:"cos²(θ)", alt:["cos^2(θ)","cos²θ","cos^2θ"],
+      pista:"Recuerda: sen²θ + cos²θ = 1 para cualquier ángulo θ."
+    }),
+    intermedio: (v,razon,deg)=>({
+      texto:`Simplifica la expresión: (1 − cos²(θ)) para θ = ${deg}°. Escribe el resultado en términos de sen(θ).`,
+      tipo:"texto", respuesta:"sen²(θ)", alt:["sen^2(θ)","sin²(θ)","sen²θ"],
+      pista:"Despeja sen²θ de la identidad sen²θ + cos²θ = 1."
+    }),
+    avanzado: (v,razon,deg)=>({
+      texto:`Comprueba numéricamente que 1 + tan²(θ) = sec²(θ) para θ = ${deg}°. Escribe el valor de 1 + tan²(θ) con 2 decimales.`,
+      tipo:"numero", respuesta: isNaN(v.tan) ? NaN : round2(1 + v.tan*v.tan),
+      pista:"Calcula tan(θ), elévalo al cuadrado y súmale 1; compáralo con sec²(θ)."
+    })
+  },
+  reciproca: {
+    basico: (v,razon,deg)=>({
+      texto:`Si sen(${deg}°) = ${fmt(v.sin)}, ¿cuál es el valor de csc(${deg}°)? (2 decimales)`,
+      tipo:"numero", respuesta: isNaN(v.csc)?NaN:round2(v.csc),
+      pista:"csc(θ) es el recíproco de sen(θ): csc(θ) = 1 / sen(θ)."
+    }),
+    intermedio: (v,razon,deg)=>({
+      texto:`Completa: sec(θ) · cos(θ) = ____, para cualquier θ donde cos(θ) ≠ 0.`,
+      tipo:"texto", respuesta:"1", alt:["1.0","1.00"],
+      pista:"sec(θ) = 1/cos(θ), así que al multiplicar se cancela."
+    }),
+    avanzado: (v,razon,deg)=>({
+      texto:`Para θ = ${deg}°, calcula cot(θ) usando la relación recíproca con tan(θ). Da el resultado con 2 decimales.`,
+      tipo:"numero", respuesta: isNaN(v.cot)?NaN:round2(v.cot),
+      pista:"cot(θ) = 1 / tan(θ)."
+    })
+  },
+  cociente: {
+    basico: (v,razon,deg)=>({
+      texto:`Completa la identidad de cociente: tan(θ) = sen(θ) / ____.`,
+      tipo:"texto", respuesta:"cos(θ)", alt:["cosθ","cos θ"],
+      pista:"La tangente se define como razón entre seno y coseno."
+    }),
+    intermedio: (v,razon,deg)=>({
+      texto:`Para θ = ${deg}°, comprueba que tan(θ) = sen(θ)/cos(θ). Calcula sen(θ)/cos(θ) con 2 decimales.`,
+      tipo:"numero", respuesta: isNaN(v.tan)?NaN:round2(v.tan),
+      pista:"Divide el valor de sen(θ) entre el de cos(θ) mostrados arriba."
+    }),
+    avanzado: (v,razon,deg)=>({
+      texto:`Simplifica: cot(θ) · tan(θ) para θ = ${deg}° (donde ambas estén definidas). Escribe el valor numérico esperado.`,
+      tipo:"numero", respuesta: (isNaN(v.tan)||isNaN(v.cot))?NaN:1,
+      pista:"cot(θ) es el recíproco de tan(θ); su producto siempre es 1 cuando existen."
+    })
+  }
+};
+
+let ejercicioActual = null;
+
+function generarEjercicio(){
+  const identidad = $("identidad").value, dif = $("dificultad").value, razon = $("razon").value, deg = Number($("angulo").value);
+  const v = razones(deg);
+  const gen = BANCO[identidad][dif](v, razon, deg);
+  ejercicioActual = gen;
+  $("exText").textContent = "🧩 " + gen.texto;
+  $("hintText").style.display = "none";
+  $("hintText").textContent = "💡 Pista: " + gen.pista;
+  $("exFeedback").className = "feedback";
+  $("exFeedback").textContent = "";
+  $("exInputArea").innerHTML = `<label for="exAnswer">Tu respuesta</label><input type="text" id="exAnswer" placeholder="${gen.tipo==='numero'?'Ej: 0.87':'Ej: cos²(θ)'}">`;
+}
+$("hintBtn").addEventListener("click", ()=>{ $("hintText").style.display="block"; });
+$("newExBtn").addEventListener("click", generarEjercicio);
+
+function normaliza(str){ return str.toLowerCase().replace(/\s+/g,"").replace(/\^2/g,"²"); }
+
+$("checkBtn").addEventListener("click", ()=>{
+  if(!ejercicioActual) return;
+  const inputEl = $("exAnswer");
+  const raw = inputEl ? inputEl.value.trim() : "";
+  const fb = $("exFeedback");
+  progreso.tot++;
+  let correcto = false;
+  if(ejercicioActual.tipo === "numero"){
+    const guess = parseFloat(raw.replace(",", "."));
+    if(isNaN(ejercicioActual.respuesta)){
+      correcto = raw.toLowerCase().includes("indefin") || isNaN(guess);
+    } else {
+      correcto = !isNaN(guess) && Math.abs(guess - ejercicioActual.respuesta) <= 0.05;
+    }
+  } else {
+    const candidatos = [ejercicioActual.respuesta, ...(ejercicioActual.alt||[])].map(normaliza);
+    correcto = candidatos.includes(normaliza(raw));
+  }
+  if(correcto){
+    progreso.ok++;
+    fb.className = "feedback ok";
+    fb.textContent = "✅ ¡Correcto! Buen manejo de la identidad trabajada.";
+  } else {
+    fb.className = "feedback bad";
+    const respMostrar = (typeof ejercicioActual.respuesta === "number") ? (isNaN(ejercicioActual.respuesta)?"indefinido":ejercicioActual.respuesta) : ejercicioActual.respuesta;
+    fb.textContent = `❌ Aún no. Respuesta esperada: ${respMostrar}. Revisa la pista y vuelve a intentar.`;
+  }
+  progreso.log.push({fecha:new Date().toISOString(), enunciado:ejercicioActual.texto, correcto});
+  actualizarEvidencia();
+  guardarProgreso();
+});
+
+function actualizarEvidencia(){
+  $("scoreOk").textContent = progreso.ok;
+  $("scoreTot").textContent = progreso.tot;
+  $("scorePct").textContent = progreso.tot ? Math.round(100*progreso.ok/progreso.tot) + "%" : "0%";
+}
+
+// ---------- Persistencia local (solo en este navegador) ----------
+function guardarProgreso(){
+  try{ localStorage.setItem("identix_progreso", JSON.stringify(progreso)); }catch(e){}
+}
+function cargarProgreso(){
+  try{
+    const data = localStorage.getItem("identix_progreso");
+    if(data){ progreso = JSON.parse(data); actualizarEvidencia(); }
+  }catch(e){}
+}
+
+$("resetBtn").addEventListener("click", ()=>{
+  progreso = {ok:0, tot:0, log:[]};
+  actualizarEvidencia();
+  guardarProgreso();
+  $("exportMsg").style.display = "none";
+});
+
+// ---------- Exportación de evidencia (capacidad downloads) ----------
+$("exportBtn").addEventListener("click", async ()=>{
+  const resumen = {
+    app: "IdentiX",
+    grado: "10°",
+    fecha: new Date().toLocaleString(),
+    correctas: progreso.ok,
+    intentos: progreso.tot,
+    precision: progreso.tot ? Math.round(100*progreso.ok/progreso.tot)+"%" : "0%",
+    detalle: progreso.log
+  };
+  const texto = JSON.stringify(resumen, null, 2);
+  const msg = $("exportMsg");
+  try{
+    const downloads = window.claude ? await window.claude.use("downloads") : null;
+    if(downloads){
+      await downloads.save({filename:"identix_evidencia.json", data:texto});
+      msg.style.display = "block";
+      msg.textContent = "📁 Se solicitó guardar tu evidencia de aprendizaje.";
+    } else {
+      throw new Error("no-downloads");
+    }
+  }catch(e){
+    // Alternativa sin capacidad de descarga: mostrar el texto para copiar
+    msg.style.display = "block";
+    msg.textContent = "📋 Copia y guarda este resumen (descarga no disponible aquí): " + texto;
+  }
+});
+
+// ---------- Eventos de controles ----------
+function refrescarTodo(){
+  $("anguloVal").textContent = $("angulo").value + "°";
+  $("anguloNum").value = $("angulo").value;
+  actualizarCalculos();
+  dibujarGrafica();
+  actualizarPrediccion();
+}
+$("angulo").addEventListener("input", refrescarTodo);
+$("anguloNum").addEventListener("input", ()=>{
+  let v = parseInt($("anguloNum").value, 10);
+  if(isNaN(v)) v = 0;
+  v = Math.max(0, Math.min(360, v));
+  $("angulo").value = v;
+  refrescarTodo();
+});
+["identidad","dificultad","razon","tipoEj"].forEach(id=>{
+  $(id).addEventListener("change", ()=>{ dibujarGrafica(); actualizarPrediccion(); generarEjercicio(); });
+});
+
+// ---------- Ola de transición ----------
+const prefiereMenosMovimiento = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function ejecutarOla(callbackAlCubrir){
+  const ola = $("waveOverlay");
+  if(prefiereMenosMovimiento || !ola){ callbackAlCubrir(); return; }
+  ola.classList.add("activa");
+  setTimeout(()=>{
+    callbackAlCubrir();
+    ola.classList.remove("activa");
+    ola.classList.add("saliendo");
+    setTimeout(()=>{
+      ola.style.transition = "none";
+      ola.classList.remove("saliendo");
+      ola.offsetHeight; // fuerza reflow
+      ola.style.transition = "";
+    }, 880);
+  }, 850);
+}
+
+// ---------- Portada ----------
+function decirCompanion(texto){
+  const b = $("companionBubble");
+  b.classList.add("cambiando");
+  setTimeout(()=>{ b.textContent = texto; b.classList.remove("cambiando"); }, 200);
+}
+$("btnComenzar").addEventListener("click", ()=>{
+  ejecutarOla(()=>{
+    const cover = $("cover");
+    cover.classList.add("oculto");
+    cover.style.display = "none";
+    decirCompanion(TIPS.practicar);
+  });
+});
+
+// ---------- Compañero flotante: consejos por pestaña ----------
+const TIPS = {
+  practicar: "Mueve el ángulo con el control deslizante y observa cómo cambian los seis valores. 🔍",
+  explicar: "Solo son 3 familias de identidades. Léelas con calma, ¡no hay afán! 📘",
+  ejemplos: "Sigue cada paso con lápiz y papel antes de mirar la conclusión. ✏️",
+  truquitos: "¿Sabías que sec 'suena' a cos y csc 'suena' a sen? Al revés de lo intuitivo. 💡",
+  juegos: "¡A jugar! El memorama es un buen repaso rápido antes de un examen. 🎮"
+};
+document.querySelectorAll(".tab-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{ if(TIPS[btn.dataset.tab]) decirCompanion(TIPS[btn.dataset.tab]); });
+});
+const CONSEJOS_EXTRA = [
+  "Recuerda: tan y sec no existen en 90° y 270°. 🚫",
+  "cot y csc no existen en 0° y 180°. 🚫",
+  "sen²θ+cos²θ=1 es la identidad 'madre': de ahí salen las otras dos pitagóricas. 🌱",
+  "Comprobar una identidad es trabajar un solo lado hasta llegar al otro. ✅",
+  "¡Exporta tu evidencia al terminar para guardar tu progreso! 🏅"
+];
+$("companionAvatar").addEventListener("click", ()=>{
+  decirCompanion(CONSEJOS_EXTRA[Math.floor(Math.random()*CONSEJOS_EXTRA.length)]);
+});
+
+// ---------- Navegación por pestañas (con ola de transición) ----------
+function irAPestana(tab){
+  const actual = document.querySelector(".tabpage.active");
+  const siguiente = $("tab-"+tab);
+  if(actual === siguiente) return;
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.toggle("active", b.dataset.tab===tab));
+
+  ejecutarOla(()=>{
+    if(actual){ actual.classList.remove("active"); actual.style.display = "none"; }
+    siguiente.style.display = "block";
+    siguiente.offsetHeight;
+    siguiente.classList.add("active");
+    if(tab === "practicar"){ dibujarGrafica(); }
+  });
+}
+document.querySelectorAll(".tab-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=> irAPestana(btn.dataset.tab));
+});
+
+// ---------- Ejercicios de álgebra con identidades ----------
+document.querySelectorAll("[data-toggle]").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    const box = $(btn.dataset.toggle);
+    box.style.display = box.style.display === "none" ? "block" : "none";
+  });
+});
+document.querySelectorAll("[data-check]").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    const inputEl = $(btn.dataset.check);
+    const fb = $("fb-" + btn.dataset.check);
+    const raw = inputEl.value.trim();
+    let correcto = false;
+    if(btn.dataset.tipo === "numero"){
+      const guess = parseFloat(raw.replace(",", "."));
+      const resp = parseFloat(btn.dataset.resp);
+      correcto = !isNaN(guess) && Math.abs(guess - resp) <= 0.03;
+    } else {
+      const candidatos = [btn.dataset.resp, ...(btn.dataset.alt ? btn.dataset.alt.split("|") : [])].map(normaliza);
+      correcto = candidatos.includes(normaliza(raw));
+    }
+    if(correcto){
+      fb.className = "feedback ok";
+      fb.textContent = "✅ ¡Correcto! Buen despeje/factorización/simplificación.";
+    } else {
+      fb.className = "feedback bad";
+      fb.textContent = "❌ Aún no. Revisa la 'Ver solución' para comparar tu procedimiento paso a paso.";
+    }
+  });
+});
+
+// ---------- Juego 1: Quiz relámpago ----------
+const BANCO_QUIZ = [
+  {p:"¿Cuál es el resultado de sen²θ + cos²θ?", ops:["1","0","2sen θ","cos θ"], r:"1"},
+  {p:"¿Cómo se define csc(θ)?", ops:["1/sen(θ)","1/cos(θ)","sen(θ)/cos(θ)","cos(θ)/sen(θ)"], r:"1/sen(θ)"},
+  {p:"¿Qué identidad corresponde a 1 + tan²θ?", ops:["sec²θ","csc²θ","1","cos²θ"], r:"sec²θ"},
+  {p:"¿Cómo se define tan(θ) en términos de sen y cos?", ops:["sen(θ)/cos(θ)","cos(θ)/sen(θ)","1/sen(θ)","sen(θ)·cos(θ)"], r:"sen(θ)/cos(θ)"},
+  {p:"¿Cuál es el recíproco de cos(θ)?", ops:["sec(θ)","csc(θ)","cot(θ)","tan(θ)"], r:"sec(θ)"},
+  {p:"¿A qué es igual sec²θ − tan²θ?", ops:["1","0","tan²θ","sec θ"], r:"1"},
+  {p:"¿Cuál es el recíproco de tan(θ)?", ops:["cot(θ)","sec(θ)","csc(θ)","cos(θ)"], r:"cot(θ)"},
+  {p:"¿A qué es igual 1 + cot²θ?", ops:["csc²θ","sec²θ","1","sen²θ"], r:"csc²θ"}
+];
+let quizScore=0, quizTot=0;
+function shuffle(arr){ return arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(v=>v[1]); }
+function nuevaPreguntaQuiz(){
+  const q = BANCO_QUIZ[Math.floor(Math.random()*BANCO_QUIZ.length)];
+  $("quizPregunta").textContent = "🧩 " + q.p;
+  const opciones = shuffle(q.ops);
+  $("quizOpciones").innerHTML = "";
+  opciones.forEach(op=>{
+    const b = document.createElement("button");
+    b.className = "op-btn"; b.textContent = op;
+    b.addEventListener("click", ()=>{
+      document.querySelectorAll("#quizOpciones .op-btn").forEach(x=>x.disabled=true);
+      quizTot++;
+      if(op === q.r){ b.classList.add("correcta"); quizScore++; }
+      else { b.classList.add("incorrecta"); }
+      $("quizScore").textContent = quizScore; $("quizTot").textContent = quizTot;
+    });
+    $("quizOpciones").appendChild(b);
+  });
+}
+$("quizNueva").addEventListener("click", nuevaPreguntaQuiz);
+
+// ---------- Juego 2: Verdadero o Falso ----------
+const BANCO_VF = [
+  {t:"sen²θ + cos²θ siempre es igual a 1.", r:true},
+  {t:"tan(θ) es igual a cos(θ)/sen(θ).", r:false},
+  {t:"csc(θ) es el recíproco de sen(θ).", r:true},
+  {t:"sec(θ) no está definida cuando cos(θ) = 0.", r:true},
+  {t:"1 + tan²θ es igual a csc²θ.", r:false},
+  {t:"cot(θ) es el recíproco de tan(θ).", r:true},
+  {t:"sec(θ) · cos(θ) siempre es igual a 0.", r:false},
+  {t:"1 + cot²θ es igual a csc²θ.", r:true}
+];
+let vfScore=0, vfTot=0, vfActual=null;
+function nuevoVF(){
+  vfActual = BANCO_VF[Math.floor(Math.random()*BANCO_VF.length)];
+  $("vfEnunciado").textContent = "📌 " + vfActual.t;
+  $("vfFeedback").className = "feedback"; $("vfFeedback").textContent = "";
+}
+function responderVF(resp){
+  if(!vfActual) return;
+  vfTot++;
+  const fb = $("vfFeedback");
+  if(resp === vfActual.r){ vfScore++; fb.className="feedback ok"; fb.textContent="✅ ¡Correcto!"; }
+  else { fb.className="feedback bad"; fb.textContent="❌ Incorrecto. El enunciado era " + (vfActual.r?"verdadero":"falso") + "."; }
+  $("vfScore").textContent = vfScore; $("vfTot").textContent = vfTot;
+}
+$("vfTrue").addEventListener("click", ()=>responderVF(true));
+$("vfFalse").addEventListener("click", ()=>responderVF(false));
+$("vfNueva").addEventListener("click", nuevoVF);
+
+// ---------- Juego 3: Memorama ----------
+const PARES_MEMO = [
+  {id:1, a:"sen²θ + cos²θ", b:"1"},
+  {id:2, a:"1 + tan²θ", b:"sec²θ"},
+  {id:3, a:"csc(θ)", b:"1/sen(θ)"},
+  {id:4, a:"tan(θ)", b:"sen(θ)/cos(θ)"}
+];
+let memoCartas=[], memoVolteadas=[], memoBloqueo=false, memoIntentos=0, memoParejas=0;
+function iniciarMemorama(){
+  memoCartas = shuffle(PARES_MEMO.flatMap(p=>[{id:p.id,texto:p.a},{id:p.id,texto:p.b}]));
+  memoVolteadas = []; memoBloqueo=false; memoIntentos=0; memoParejas=0;
+  $("memoIntentos").textContent = 0; $("memoParejas").textContent = 0;
+  const grid = $("memoGrid"); grid.innerHTML = "";
+  memoCartas.forEach((c, i)=>{
+    const btn = document.createElement("button");
+    btn.className = "memo-card"; btn.textContent = "❓"; btn.dataset.idx = i;
+    btn.addEventListener("click", ()=>voltearCarta(i, btn));
+    grid.appendChild(btn);
+  });
+}
+function voltearCarta(i, btn){
+  if(memoBloqueo || btn.classList.contains("match") || memoVolteadas.some(v=>v.i===i)) return;
+  btn.textContent = memoCartas[i].texto;
+  btn.classList.add("volteada");
+  memoVolteadas.push({i, btn});
+  if(memoVolteadas.length === 2){
+    memoBloqueo = true; memoIntentos++; $("memoIntentos").textContent = memoIntentos;
+    const [c1, c2] = memoVolteadas;
+    if(memoCartas[c1.i].id === memoCartas[c2.i].id){
+      c1.btn.classList.add("match"); c2.btn.classList.add("match");
+      memoParejas++; $("memoParejas").textContent = memoParejas;
+      memoVolteadas = []; memoBloqueo = false;
+    } else {
+      setTimeout(()=>{
+        c1.btn.textContent="❓"; c2.btn.textContent="❓";
+        c1.btn.classList.remove("volteada"); c2.btn.classList.remove("volteada");
+        memoVolteadas = []; memoBloqueo = false;
+      }, 900);
+    }
+  }
+}
+$("memoReiniciar").addEventListener("click", iniciarMemorama);
+
+// ---------- Inicio ----------
+cargarProgreso();
+refrescarTodo();
+generarEjercicio();
+nuevaPreguntaQuiz();
+nuevoVF();
+iniciarMemorama();
+</script>
+</body>
+</html>
